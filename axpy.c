@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
 
         AXPY(&m, alpha, x, &inc_x, y, &inc_y);
         ref_axpy(m, alpha[0], nx, inc_x, ny, inc_y);
-        compare_vals(m, y,inc_y, ny,inc_y "Y: ");
+        compare_vals(m, y,inc_y, ny,inc_y,"Y: ");
         fprintf(stderr, "------------\n");
 
     }
