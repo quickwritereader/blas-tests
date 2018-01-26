@@ -96,6 +96,6 @@ FLOAT *x, *y ,*nx , *ny;
         fprintf(stderr, "------------\n");
 
   }
-
+     free(x);free(nx);  free(y);free(ny);
   return 0;
 }

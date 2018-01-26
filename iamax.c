@@ -137,7 +137,7 @@ while (i < N) {
          
         fprintf(stderr, "------------\n");
 
- 
+        free(x);
 
 return 0;
 }

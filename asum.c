@@ -53,7 +53,8 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     if (( nx = (FLOAT *)malloc(sizeof(FLOAT) * to * abs(inc_x) * COMPSIZE)) == NULL){
-    fprintf(stderr,"Out of Memory!!\n");exit(1);
+    fprintf(stderr,"Out of Memory!!\n");
+    exit(1);
   }    
  
 
@@ -80,7 +81,7 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "------------\n");
 
     }
- 
+    free(x);free(nx);
 
 return 0;
 }

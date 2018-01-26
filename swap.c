@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "------------\n");
 
     }
- 
+    free(x);free(nx);  free(y);free(ny);
 
 return 0;
 }

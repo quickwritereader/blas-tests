@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
 
 
     }
-
+       free(x);free(y);
     return 0;
 }
 
