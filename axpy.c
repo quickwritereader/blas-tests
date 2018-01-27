@@ -3,11 +3,18 @@
 
 #undef AXPY
 
-
+#ifdef COMPLEX
+#ifdef DOUBLE
+#define AXPY   BLASFUNC(zaxpy)
+#else
+#define AXPY   BLASFUNC(caxpy)
+#endif
+#else
 #ifdef DOUBLE
 #define AXPY   BLASFUNC(daxpy)
 #else
 #define AXPY   BLASFUNC(saxpy)
+#endif
 #endif
 
 int main(int argc, char *argv[]) {
@@ -18,6 +25,18 @@ int main(int argc, char *argv[]) {
     blasint m, i;
     blasint inc_x = 1, inc_y = 1;
     char *p;
+
+    int zcase = 0;
+
+#ifdef COMPLEX
+    //real zero, image zero, both zero, both random
+    const char *case_names[] = {"r_zero", "i_zero", "both zero", "both random"};
+    int zero_case[] = {1, 2, 3, 0};
+#else
+    //zero, random
+    const char *case_names[] = {"zero", "random"};
+    int zero_case[] = {1, 0};
+#endif        
 
     int from = 1;
     int to = 200;
@@ -58,7 +77,7 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Out of Memory!!\n");
         exit(1);
     }
-    
+
     if ((nx = (FLOAT *) malloc(sizeof (FLOAT) * to * abs(inc_x) * COMPSIZE)) == NULL) {
         fprintf(stderr, "Out of Memory!!\n");
         exit(1);
@@ -76,30 +95,44 @@ int main(int argc, char *argv[]) {
 
     for (m = from; m <= to; m += step) {
 
-        fprintf(stderr, " %6d : ", (int) m);
+        for (zcase = 0; zcase<sizeof (zero_case) / sizeof (int); zcase++) {
+            int casex = zero_case[zcase];
+            fprintf(stderr, " %6d  %s alpha: \n", (int) m, case_names[zcase]);
+            alpha[0] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+            alpha[1] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
 
 
-        for (i = 0; i < m * COMPSIZE * abs(inc_x); i++) {
-            x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-            nx[i] = x[i];
+            if ((casex & 1) == 1) {
+                alpha[0] = 0;
+            }
+            if ((casex & 2) == 2) {
+                alpha[1] = 0;
+            }
+
+
+            for (i = 0; i < m * COMPSIZE * abs(inc_x); i++) {
+                x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+                nx[i] = x[i];
+            }
+
+            for (i = 0; i < m * COMPSIZE * abs(inc_y); i++) {
+                y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+                ny[i] = y[i];
+            }
+
+
+            AXPY(&m, alpha, x, &inc_x, y, &inc_y);
+            ref_axpy(m, alpha, nx, inc_x, ny, inc_y);
+            compare_vals(m, y, inc_y, ny, inc_y, "Y: ");
+
         }
-
-        for (i = 0; i < m * COMPSIZE * abs(inc_y); i++) {
-            y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-            ny[i] = y[i];
-        }
-
-        alpha[0] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-        alpha[1] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-
-        AXPY(&m, alpha, x, &inc_x, y, &inc_y);
-        ref_axpy(m, alpha[0], nx, inc_x, ny, inc_y);
-        compare_vals(m, y,inc_y, ny,inc_y,"Y: ");
         fprintf(stderr, "------------\n");
 
     }
-   free(x);free(nx);  free(y);free(ny);
+    free(x);
+    free(nx);
+    free(y);
+    free(ny);
 
-return 0;
+    return 0;
 }
- 

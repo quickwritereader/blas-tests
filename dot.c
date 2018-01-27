@@ -1,17 +1,34 @@
 #include "bl_test.h"
-
+#include <complex.h>
 #undef DOT
+#ifdef COMPLEX
+#ifdef CONJ
+#ifdef DOUBLE
+#define DOT   BLASFUNC(zdotc) 
+#else
+#define DOT   BLASFUNC(cdotc) 
+#endif
+#else
+#ifdef DOUBLE
+#define DOT   BLASFUNC(zdotu) 
+#else
+#define DOT   BLASFUNC(cdotu) 
+#endif
+#endif
 
+
+#else
 #ifdef DOUBLE
 #define DOT   BLASFUNC(ddot) 
 #else
 #define DOT   BLASFUNC(sdot) 
 #endif
+#endif
 
 int main(int argc, char *argv[]) {
 
     FLOAT *x, *y;
-    FLOAT result;
+
     blasint m, i;
     blasint inc_x = 1, inc_y = 1;
 
@@ -78,16 +95,20 @@ int main(int argc, char *argv[]) {
             y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
         }
 
-
-        result = DOT(&m, x, &inc_x, y, &inc_y);
+#ifdef COMPLEX
+        FLOAT _Complex result=DOT(&m, x, &inc_x, y, &inc_y);
+        COMPLEX_FLOAT result2 = ref_zcdot(m, x, inc_x, y, inc_y); 
+#else        
+        FLOAT result = DOT(&m, x, &inc_x, y, &inc_y);
         FLOAT result2 = ref_dot(m, x, inc_x, y, inc_y);
-
-        compare_vals(1, &result,1, &result2,1, "DOT ERR: ");
+#endif
+        compare_vals(1, (FLOAT*) & result, 1, (FLOAT*) & result2, 1, "DOT ERR: ");
         fprintf(stderr, "------------\n");
 
 
     }
-       free(x);free(y);
+    free(x);
+    free(y);
     return 0;
 }
 

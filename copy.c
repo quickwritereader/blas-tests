@@ -19,10 +19,10 @@
 
 int main(int argc, char *argv[]) {
 
-    FLOAT *x,   *y ;
- 
+    FLOAT *x, *y;
+
     blasint m, i;
-    blasint inc_x = 1 ;
+    blasint inc_x = 1;
     blasint inc_y = 1;
     char *p;
 
@@ -52,22 +52,22 @@ int main(int argc, char *argv[]) {
 
 
     if ((p = getenv("OPENBLAS_INCX"))) inc_x = atoi(p);
-    if ((p = getenv("OPENBLAS_INCY"))) inc_y = atoi(p); 
+    if ((p = getenv("OPENBLAS_INCY"))) inc_y = atoi(p);
 
-    fprintf(stderr, "From : %3d  To : %3d Step = %3d Inc_x = %d  Inc_y = %d \n", from, to, step, inc_x ,inc_y);
+    fprintf(stderr, "From : %3d  To : %3d Step = %3d Inc_x = %d  Inc_y = %d \n", from, to, step, inc_x, inc_y);
 
     if ((x = (FLOAT *) malloc(sizeof (FLOAT) * to * abs(inc_x) * COMPSIZE)) == NULL) {
         fprintf(stderr, "Out of Memory!!\n");
         exit(1);
     }
 
-   
+
     if ((y = (FLOAT *) malloc(sizeof (FLOAT) * to * abs(inc_y) * COMPSIZE)) == NULL) {
         fprintf(stderr, "Out of Memory!!\n");
         exit(1);
     }
 
-   
+
 
 #ifdef linux
     srandom(getpid());
@@ -80,28 +80,28 @@ int main(int argc, char *argv[]) {
 
 
         for (i = 0; i < m * COMPSIZE * abs(inc_x); i++) {
-            x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5; 
+            x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
         }
-        
+
         for (i = 0; i < m * COMPSIZE * abs(inc_y); i++) {
-            y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5; 
+            y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
         }
- 
 
 
-        COPY (&m, x, &inc_x, y, &inc_y );
- 
-        compare_vals(m, x,inc_x, y,inc_y, "COPY: ");
-        
+
+        COPY(&m, x, &inc_x, y, &inc_y);
+
+        compare_vals(m, x, inc_x, y, inc_y, "COPY: ");
+
         fprintf(stderr, "------------\n");
 
     }
- 
-   free(x);  free(y) ;
-return 0;
+
+    free(x);
+    free(y);
+    return 0;
 }
- 
 
-    	
 
-    	 
+
+

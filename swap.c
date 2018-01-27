@@ -19,10 +19,10 @@
 
 int main(int argc, char *argv[]) {
 
-    FLOAT *x,   *y , *nx,*ny;
- 
+    FLOAT *x, *y, *nx, *ny;
+
     blasint m, i;
-    blasint inc_x = 1 ;
+    blasint inc_x = 1;
     blasint inc_y = 1;
     char *p;
 
@@ -52,16 +52,16 @@ int main(int argc, char *argv[]) {
 
 
     if ((p = getenv("OPENBLAS_INCX"))) inc_x = atoi(p);
-    if ((p = getenv("OPENBLAS_INCY"))) inc_y = atoi(p); 
+    if ((p = getenv("OPENBLAS_INCY"))) inc_y = atoi(p);
 
-    fprintf(stderr, "From : %3d  To : %3d Step = %3d Inc_x = %d  Inc_y = %d \n", from, to, step, inc_x ,inc_y);
+    fprintf(stderr, "From : %3d  To : %3d Step = %3d Inc_x = %d  Inc_y = %d \n", from, to, step, inc_x, inc_y);
 
     if ((x = (FLOAT *) malloc(sizeof (FLOAT) * to * abs(inc_x) * COMPSIZE)) == NULL) {
         fprintf(stderr, "Out of Memory!!\n");
         exit(1);
     }
 
-   
+
     if ((y = (FLOAT *) malloc(sizeof (FLOAT) * to * abs(inc_y) * COMPSIZE)) == NULL) {
         fprintf(stderr, "Out of Memory!!\n");
         exit(1);
@@ -71,12 +71,12 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-   
+
     if ((ny = (FLOAT *) malloc(sizeof (FLOAT) * to * abs(inc_y) * COMPSIZE)) == NULL) {
         fprintf(stderr, "Out of Memory!!\n");
         exit(1);
     }
-   
+
 
 #ifdef linux
     srandom(getpid());
@@ -92,27 +92,29 @@ int main(int argc, char *argv[]) {
             x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
             nx[i] = x[i];
         }
-        
+
         for (i = 0; i < m * COMPSIZE * abs(inc_y); i++) {
-            y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5; 
-            ny[i]=y[i];
+            y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+            ny[i] = y[i];
         }
 
-        
 
-        SWAP (&m, x, &inc_x, y, &inc_y );
- 
-        compare_vals(m, x,inc_x, ny,inc_y, "SWAP X: ");
-        compare_vals(m, nx,inc_x, y,inc_y, "SWAP Y: ");        
+
+        SWAP(&m, x, &inc_x, y, &inc_y);
+
+        compare_vals(m, x, inc_x, ny, inc_y, "SWAP X: ");
+        compare_vals(m, nx, inc_x, y, inc_y, "SWAP Y: ");
         fprintf(stderr, "------------\n");
 
     }
-    free(x);free(nx);  free(y);free(ny);
+    free(x);
+    free(nx);
+    free(y);
+    free(ny);
 
-return 0;
+    return 0;
 }
- 
 
-    	
 
-    	 
+
+
