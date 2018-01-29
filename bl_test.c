@@ -103,7 +103,6 @@ void compare_aggregate_real(BLASLONG aggregated_N, FLOAT  x, FLOAT  y, const cha
                
  //   }
     
-     LOG( "%le %le %.16f %ld  \n", 8.0 * EPL, maxDiff, (double) maxDiff, aggregated_N );
 
  
     if (!nearlyEqual(x , y , maxDiff)) {

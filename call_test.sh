@@ -4,12 +4,19 @@ do
 echo "Tests $x"
 export OPENBLAS_INCX=1
 export OPENBLAS_INCY=1
-./$x 8  377 
+echo "INCX=${OPENBLAS_INCX} INCY=${OPENBLAS_INCY}"
+./$x 5  177 
 export OPENBLAS_INCY=4
-./$x 8 377
+echo "INCX=${OPENBLAS_INCX} INCY=${OPENBLAS_INCY}"
+
+./$x 5 177
 export OPENBLAS_INCX=4
-./$x 8 377
+echo "INCX=${OPENBLAS_INCX} INCY=${OPENBLAS_INCY}"
+
+./$x 5 177
 export OPENBLAS_INCX=7
 export OPENBLAS_INCY=7
-./$x 8 377
+echo "INCX=${OPENBLAS_INCX} INCY=${OPENBLAS_INCY}"
+
+./$x 5 177
 done

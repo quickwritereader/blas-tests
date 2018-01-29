@@ -12,4 +12,10 @@ Simple make (default directory ../ default lib: libopenblas.a)
 
 Full make: 
     make test_ddot BLAS_INC_DIR=INCLUDEDIR BLAS_LIB_DIR=LIBRARYDIR BLAS_LIBS="libopenblas.a .."
+
+```
+
+## Test
+```
+   bash call_test.sh
 ```
