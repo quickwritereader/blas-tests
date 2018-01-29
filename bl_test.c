@@ -127,8 +127,6 @@ void compare_aggregate(BLASLONG aggregated_N, FLOAT *x, FLOAT *y, const char * s
 #endif                
  //   }
     
-     LOG( "%le %le %.16f %ld  \n", 8.0 * EPL, maxDiff, (double) maxDiff, aggregated_N );
-
 
 #ifdef COMPLEX    
     if (!nearlyEqual(x[0], y[0], maxDiff) || !nearlyEqual(x[1], y[1], maxDiff)) {
