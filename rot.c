@@ -112,8 +112,8 @@ int main(int argc, char *argv[]) {
         ref_rot(m, nx, inc_x, ny, inc_y, c[0], s[0]);
 
 
-        compare_vals(m, x, inc_x, nx, inc_x, " X: ");
-        compare_vals(m, y, inc_y, ny, inc_y, "Y: ");
+        compare_vals(m, x, inc_x, nx, inc_x, "ROT X: ");
+        compare_vals(m, y, inc_y, ny, inc_y, "ROT Y: ");
 
         fprintf(stderr, "------------\n");
 

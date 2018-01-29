@@ -39,20 +39,26 @@ int main(int argc, char *argv[]) {
         argc--;
         argv++;
     }
+    
+    if (argc > 0) {
+        N = atol(*argv);
+        argc--;
+        argv++;
+    }
      
 
 
     if ((p = getenv("OPENBLAS_INCX"))){
         inc_x = atoi(p);
         if(inc_x<=0) inc_x=1;
-        fprintf(stderr, "inc_x reset to 1\n");      
+        LOG( "inc_x reset to 1\n");      
     }
  
 
-    fprintf(stderr, "N: %d Inc_x = %d  \n", N, inc_x );
+    LOG( "N: %d Inc_x = %d  \n", N, inc_x );
 
     if ((x = (FLOAT *) malloc(sizeof (FLOAT) * N * abs(inc_x) * COMPSIZE)) == NULL) {
-        fprintf(stderr, "Out of Memory!!\n");
+        LOG( "Out of Memory!!\n");
         exit(1);
     }
 
@@ -105,12 +111,12 @@ while (i < N) {
             i++;
         }
 #endif       
-        fprintf(stderr, " %6d : Compare min \n", (int) N);
-        
+        LOG( " %6d : Compare min \n", (int) N);
+        int not_passed=0;
         ret_min=IAMIN (&N, x, &inc_x);
-        fprintf(stderr, "%d %c= %d\t",ret_min,(ret_min==min+1)?'=':'!',min+1);        
-        
-        fprintf(stderr, "\n %6d : Compare shifting and swapping minimum index from 0 to MIN(N,127) \n", (int) N);
+        LOG( "%d %c= %d\t",ret_min,(ret_min==min+1)?'=':'!',min+1);        
+        not_passed=(ret_min==min+1)?0:1;
+        LOG( "\n %6d : Compare shifting and swapping minimum index from 0 to MIN(N,127) \n", (int) N);
         
         for(i=0;i<MIN(N,127);i++){
             //swap
@@ -130,12 +136,19 @@ while (i < N) {
             min=i;
 #endif
            ret_min=IAMIN (&N, x, &inc_x);
-           fprintf(stderr, "%d %c= %d\t",ret_min,(ret_min==min+1)?'=':'!',min+1); 
+           not_passed=(ret_min==min+1)?0:1;
+           LOG(  "%d %c= %d\t",ret_min,(ret_min==min+1)?'=':'!',min+1); 
             
             
         }
-         
-        fprintf(stderr, "------------\n");
+        LOG("\n");
+        if(not_passed) {
+          ERROR_LOG("%s",STRINGIZE(IAMIN));
+        }else{
+           PASS_LOG("%s",STRINGIZE(IAMIN));
+            
+        }
+        LOG(  "------------\n");
 
         free(x);
 

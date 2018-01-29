@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
             SCAL(&m, alpha, x, &inc_x);
 
             ref_scal(m, alpha, nx, inc_x);
-            compare_vals(m, x, inc_x, nx, inc_x, "SCAL: ");
+            compare_vals(m, x, inc_x, nx, inc_x, STRINGIZE(SCAL));
 
 
         }

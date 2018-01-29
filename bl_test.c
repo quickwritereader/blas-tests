@@ -1,59 +1,149 @@
 #include "bl_test.h"
 
+static int nearlyEqual(FLOAT a, FLOAT b, double max_diff) {
+    FLOAT absA = ABS(a);
+    FLOAT absB = ABS(b);
+    FLOAT diff = ABS(a - b);
+
+    if (diff <= max_diff)
+        return 1;
+
+    FLOAT largest = MAX(absA, absB);
+
+    if (diff <= (double) largest * max_diff)
+        return 1;
+
+ 
+    return 0;
+}
+
 void compare_vals_zc(BLASLONG n, FLOAT *x, BLASLONG inc_x, FLOAT *y, BLASLONG inc_y, const char * str) {
     BLASLONG i = 0;
     BLASLONG ix = 0, iy = 0;
-    double absolute_error = -1000.0;
-    BLASLONG ind = -1; 
+
+    BLASLONG ind = -1;
     inc_x *= 2;
     inc_y *= 2;
-    int is_image = 0;
+
+    double maxDiff = EPL * 4.0;
+
+
     for (; i < n; i++) {
-        FLOAT err = (double) ABS(y[iy] - x[ix]);
-        if (err > absolute_error) {
+        if (!nearlyEqual(x[ix], y[iy], maxDiff) || !nearlyEqual(x[ix + 1], y[iy + 1], maxDiff)) {
             ind = i;
-            absolute_error = err;
-            is_image = 0;
+            break;
         }
-        err = (double) ABS(y[iy + 1] - x[ix + 1]);
-        if (err > absolute_error) {
-            ind = i;
-            absolute_error = err;
-            is_image = 1;
-        }
+
         ix += inc_x;
         iy += inc_y;
     }
-    fprintf(stderr, "%s MaxError Index: [%ld{%c}]  Abs: %le  Rel: %.6f \n", str, (long int) ind, is_image ? 'i' : 'r', absolute_error, absolute_error / ABS(y[ind * inc_y + is_image]));
- 
+    if (ind >= 0) {
+        ERROR_LOG(  "%s Error Index: [%ld ] maxdiff %le \n", str, (long int) ind, maxDiff);
+
+        int last = MIN(ind + 16, n);
+        int begin = MAX(last - 16, 0);
+        for (i = begin; i < last; i++)
+            LOG(  "%ld)): {%f,%f}   {%f,%f} \n", i, x[i * inc_x ], x[i * inc_x + 1], y[i * inc_y ], y[i * inc_y + 1]);
+
+
+    } else {
+
+        PASS_LOG(  "%s PASSED for maxdiff %le\n", str, maxDiff);
+    }
 }
 
 void compare_vals_ds(BLASLONG n, FLOAT *x, BLASLONG inc_x, FLOAT *y, BLASLONG inc_y, const char * str) {
     BLASLONG i = 0;
     BLASLONG ix = 0, iy = 0;
-    double absolute_error = -1000.0;
     BLASLONG ind = -1;
-  
+
+    double maxDiff = EPL * 8.0;
+ 
+
     for (; i < n; i++) {
-        FLOAT err = (double) ABS(y[iy] - x[ix]);
-        if (err > absolute_error) {
+        if (!nearlyEqual(x[ix], y[iy], maxDiff)) {
             ind = i;
-            absolute_error = err;
+            break;
         }
         ix += inc_x;
         iy += inc_y;
     }
-    fprintf(stderr, "%s MaxError Index: [%ld] Abs: %le  Rel: %.6f \n", str, (long int) ind, absolute_error, absolute_error / ABS(y[ind * inc_y]));
-   
+    if (ind >= 0) {
+        ERROR_LOG( "%s Error Index: [%ld ] maxdiff %le \n", str, (long int) ind, maxDiff);
+
+        int last = MIN(ind + 16, n);
+        int begin = MAX(last - 16, 0);
+        for (i = begin; i < last; i++)
+            LOG( "%ld)): {%f}   {%f } \n", i, x[i * inc_x ], y[i * inc_y ]);
+
+    } else {
+
+        PASS_LOG( "%s PASSED for maxdiff %le\n", str, maxDiff);
+    }
 }
 
 void compare_vals(BLASLONG n, FLOAT *x, BLASLONG inc_x, FLOAT *y, BLASLONG inc_y, const char * str) {
- 
+
 #ifdef COMPLEX
-    compare_vals_zc( n,  x,  inc_x,  y,  inc_y,   str) ;
+    compare_vals_zc(n, x, inc_x, y, inc_y, str);
 #else    
-   compare_vals_ds( n,  x,  inc_x,  y,  inc_y,   str) ;
+
+    compare_vals_ds(n, x, inc_x, y, inc_y, str);
 #endif    
+}
+
+void compare_aggregate_real(BLASLONG aggregated_N, FLOAT  x, FLOAT  y, const char * str) {
+
+
+    double maxDiff = EPL * 8.0;
+    aggregated_N = MAX(1.0, aggregated_N);
+  //  if (strncmp(str, "ASUM", MIN(4, strlen(str))) == 0 || strncmp(str, "DOT", MIN(3, strlen(str))) == 0) {
+ 
+        maxDiff = EPL * (double) (2 * aggregated_N);
+               
+ //   }
+    
+     LOG( "%le %le %.16f %ld  \n", 8.0 * EPL, maxDiff, (double) maxDiff, aggregated_N );
+
+ 
+    if (!nearlyEqual(x , y , maxDiff)) {
+        ERROR_LOG (" {%f} {%f } maxdiff %le\n", x , y , maxDiff);
+    } 
+    else {
+        PASS_LOG( "%s PASSED for maxdiff %le\n", str, maxDiff);
+    }
+
+}
+
+void compare_aggregate(BLASLONG aggregated_N, FLOAT *x, FLOAT *y, const char * str) {
+
+
+    double maxDiff = EPL * 8.0;
+    aggregated_N = MAX(1.0, aggregated_N);
+  //  if (strncmp(str, "ASUM", MIN(4, strlen(str))) == 0 || strncmp(str, "DOT", MIN(3, strlen(str))) == 0) {
+#ifdef COMPLEX
+        maxDiff = EPL * (double) (8 * aggregated_N);
+#else
+        maxDiff = EPL * (double) (2 * aggregated_N);
+#endif                
+ //   }
+    
+     LOG( "%le %le %.16f %ld  \n", 8.0 * EPL, maxDiff, (double) maxDiff, aggregated_N );
+
+
+#ifdef COMPLEX    
+    if (!nearlyEqual(x[0], y[0], maxDiff) || !nearlyEqual(x[1], y[1], maxDiff)) {
+        ERROR_LOG( "{%f,%f}   {%f,%f} maxdiff %le\n", x[0 ], x[1], y[0], y[1], maxDiff);
+    }
+#else
+    if (!nearlyEqual(x[0], y[0], maxDiff)) {
+        ERROR_LOG (" {%f} {%f } maxdiff %le\n", x[0 ], y[0], maxDiff);
+    }
+#endif  
+    else {
+        PASS_LOG( "%s PASSED for maxdiff %le\n", str, maxDiff);
+    }
+
 }
 
 FLOAT ref_dot(BLASLONG n, FLOAT *x, BLASLONG inc_x, FLOAT *y, BLASLONG inc_y) {
@@ -110,6 +200,7 @@ COMPLEX_FLOAT ref_zcdot(BLASLONG n, FLOAT *x, BLASLONG inc_x, FLOAT *y, BLASLONG
     }
     result.real = dot[0];
     result.imag = dot[1];
+
     return (result);
 }
 
@@ -171,6 +262,7 @@ int ref_rot(BLASLONG n, FLOAT *x, BLASLONG inc_x, FLOAT *y, BLASLONG inc_y, FLOA
 
 
     while (i < n) {
+
         temp = c * x[ix] + s * y[iy];
         y[iy] = c * y[iy] - s * x[ix];
         x[ix] = temp;

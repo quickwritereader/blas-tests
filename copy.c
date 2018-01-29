@@ -54,16 +54,16 @@ int main(int argc, char *argv[]) {
     if ((p = getenv("OPENBLAS_INCX"))) inc_x = atoi(p);
     if ((p = getenv("OPENBLAS_INCY"))) inc_y = atoi(p);
 
-    fprintf(stderr, "From : %3d  To : %3d Step = %3d Inc_x = %d  Inc_y = %d \n", from, to, step, inc_x, inc_y);
+    LOG( "From : %3d  To : %3d Step = %3d Inc_x = %d  Inc_y = %d \n", from, to, step, inc_x, inc_y);
 
     if ((x = (FLOAT *) malloc(sizeof (FLOAT) * to * abs(inc_x) * COMPSIZE)) == NULL) {
-        fprintf(stderr, "Out of Memory!!\n");
+        LOG( "Out of Memory!!\n");
         exit(1);
     }
 
 
     if ((y = (FLOAT *) malloc(sizeof (FLOAT) * to * abs(inc_y) * COMPSIZE)) == NULL) {
-        fprintf(stderr, "Out of Memory!!\n");
+        LOG( "Out of Memory!!\n");
         exit(1);
     }
 
@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
 
     for (m = from; m <= to; m += step) {
 
-        fprintf(stderr, " %6d : ", (int) m);
+        LOG( " %6d : ", (int) m);
 
 
         for (i = 0; i < m * COMPSIZE * abs(inc_x); i++) {
@@ -91,9 +91,9 @@ int main(int argc, char *argv[]) {
 
         COPY(&m, x, &inc_x, y, &inc_y);
 
-        compare_vals(m, x, inc_x, y, inc_y, "COPY: ");
+        compare_vals(m, x, inc_x, y, inc_y, STRINGIZE(COPY));
 
-        fprintf(stderr, "------------\n");
+        LOG( "------------\n");
 
     }
 

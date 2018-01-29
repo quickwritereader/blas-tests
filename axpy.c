@@ -66,25 +66,25 @@ int main(int argc, char *argv[]) {
     if ((p = getenv("OPENBLAS_INCX"))) inc_x = atoi(p);
     if ((p = getenv("OPENBLAS_INCY"))) inc_y = atoi(p);
 
-    fprintf(stderr, "From : %3d  To : %3d Step = %3d Inc_x = %d Inc_y = %d \n", from, to, step, inc_x, inc_y);
+    LOG( "From : %3d  To : %3d Step = %3d Inc_x = %d Inc_y = %d \n", from, to, step, inc_x, inc_y);
 
     if ((x = (FLOAT *) malloc(sizeof (FLOAT) * to * abs(inc_x) * COMPSIZE)) == NULL) {
-        fprintf(stderr, "Out of Memory!!\n");
+        LOG( "Out of Memory!!\n");
         exit(1);
     }
 
     if ((y = (FLOAT *) malloc(sizeof (FLOAT) * to * abs(inc_y) * COMPSIZE)) == NULL) {
-        fprintf(stderr, "Out of Memory!!\n");
+        LOG( "Out of Memory!!\n");
         exit(1);
     }
 
     if ((nx = (FLOAT *) malloc(sizeof (FLOAT) * to * abs(inc_x) * COMPSIZE)) == NULL) {
-        fprintf(stderr, "Out of Memory!!\n");
+        LOG( "Out of Memory!!\n");
         exit(1);
     }
 
     if ((ny = (FLOAT *) malloc(sizeof (FLOAT) * to * abs(inc_y) * COMPSIZE)) == NULL) {
-        fprintf(stderr, "Out of Memory!!\n");
+        LOG( "Out of Memory!!\n");
         exit(1);
     }
 
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
 
         for (zcase = 0; zcase<sizeof (zero_case) / sizeof (int); zcase++) {
             int casex = zero_case[zcase];
-            fprintf(stderr, " %6d  %s alpha: \n", (int) m, case_names[zcase]);
+            LOG( " %6d  %s alpha: \n", (int) m, case_names[zcase]);
             alpha[0] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
             alpha[1] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
 
@@ -123,10 +123,10 @@ int main(int argc, char *argv[]) {
 
             AXPY(&m, alpha, x, &inc_x, y, &inc_y);
             ref_axpy(m, alpha, nx, inc_x, ny, inc_y);
-            compare_vals(m, y, inc_y, ny, inc_y, "Y: ");
+            compare_vals(m, y, inc_y, ny, inc_y, STRINGIZE(AXPY));
 
         }
-        fprintf(stderr, "------------\n");
+        LOG( "------------\n");
 
     }
     free(x);
