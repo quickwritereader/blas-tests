@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
  
 
     for (i = 0; i < N * COMPSIZE * abs(inc_x); i++) {
-            x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5; 
+            x[i] =  ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5; 
         }
  
     i=0;
@@ -114,9 +114,45 @@ while (i < N) {
         
         ret_max=IAMAX (&N, x, &inc_x);
         LOG( "%d %c= %d\t",ret_max,(ret_max==max+1)?'=':'!',max+1);        
-        int  not_passed=(ret_max==max+1)?0:1;
+    int    not_passed =(ret_max==max+1)?0:1;
         LOG( "\n %6d : Compare shifting and swapping maximum index from 0 to MIN(N,127) \n", (int) N);
-        
+        LOG("Duplicate max values will be zeroed so that. Any element of x[max+1:END] !=maxf \n");
+     FLOAT diff;
+#ifdef COMPLEX 
+    
+    ix = max*inc_x2 +inc_x2;
+    i=max+1;
+
+    while(i < MIN(N,127))
+    {
+       
+       diff= CABS1(x,ix)-maxf ;          
+        if( ABS(diff ) <0.0001)
+        {
+            x[ix]=0;
+            x[ix+1]=0;
+            
+        }
+        ix += inc_x2;
+        i++;
+    }
+#else  
+    ix =max* inc_x+inc_x;
+    i=max+1;
+while (i < MIN(N,127)) {
+       diff= ABS(x[ix])-maxf ;          
+        if( ABS(diff ) <0.0001)
+        {
+            x[ix]=0;
+            
+        }
+        ix += inc_x;
+        i++;           
+
+        }
+#endif         
+
+
         for(i=0;i<MIN(N,127);i++){
             //swap
 #ifdef COMPLEX
@@ -135,11 +171,48 @@ while (i < N) {
             max=i;
 #endif
            ret_max=IAMAX (&N, x, &inc_x);
-            not_passed=(ret_max==max+1)?0:1;
-           LOG( "%d %c= %d\t",ret_max,(ret_max==max+1)?'=':'!',max+1);  
+            not_passed |=(ret_max==max+1)?0:1;
+           LOG( "%d %c= %d \t",ret_max,(ret_max==max+1)?'=':'!',max+1);  
             
             
         }
+
+        LOG("\n TEST with duplicate max values to check minimum index:\n NOTE: important for simd vector code case  \n");
+        
+        int minnx=MIN(N,127);
+        int duplicate_begin=MAX(0,minnx-13);
+
+        for(i=duplicate_begin;i<minnx;i++){
+#ifdef COMPLEX
+          x[i*inc_x2]=x[max*inc_x2];
+          x[i*inc_x2+1]=x[max*inc_x2+1];
+#else
+          x[i*inc_x]=x[max*inc_x];
+
+#endif               
+ 
+        }
+
+
+           ret_max=IAMAX (&N, x, &inc_x);
+            not_passed |=(ret_max==duplicate_begin+1)?0:1;
+           LOG( "%d %c= %d \t",ret_max,(ret_max==duplicate_begin+1)?'=':'!',duplicate_begin+1);  
+
+        
+          i=duplicate_begin=MAX(0,minnx-14);
+            
+#ifdef COMPLEX
+          x[i*inc_x2]=x[max*inc_x2];
+          x[i*inc_x2+1]=x[max*inc_x2+1];
+#else
+          x[i*inc_x]=x[max*inc_x];
+
+#endif         
+           ret_max=IAMAX (&N, x, &inc_x);
+            not_passed |=(ret_max==duplicate_begin+1)?0:1;
+           LOG( "%d %c= %d \t",ret_max,(ret_max==duplicate_begin+1)?'=':'!',duplicate_begin+1);  
+
+
          LOG("\n");
         if(not_passed) {
           ERROR_LOG("%s",STRINGIZE(IAMAX));

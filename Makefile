@@ -1,11 +1,11 @@
 
-BLAS_INC_DIR = ..
-BLAS_LIB_DIR = ..
+BLAS_INC_DIR = /home/ubuntu/OpenBLAS
+BLAS_LIB_DIR = /home/ubuntu/OpenBLAS
 BLAS_LIBS := libopenblas.a
 INCLUDES = -I. -I$(BLAS_INC_DIR)
 CC	   := gcc
 LINKER   := $(CC)
-CFLAGS   := -O2 -Wall 
+CFLAGS   := -O2 -Wall -fopenmp
 LDFLAGS := -lm  -lpthread
 LIB_BLAS   := $(foreach libx,$(BLAS_LIBS), $(BLAS_LIB_DIR)/$(libx))
 UTIL	   := bl_test.o
