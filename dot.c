@@ -90,12 +90,10 @@ int main(int argc, char *argv[]) {
         for (i = 0; i < m * COMPSIZE * abs(inc_x); i++) {
             x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
         }
-
         for (i = 0; i < m * COMPSIZE * abs(inc_y); i++) {
             y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
         }
-
-#ifdef COMPLEX
+#ifdef COMPLEX 
         FLOAT _Complex result=DOT(&m, x, &inc_x, y, &inc_y);
         COMPLEX_FLOAT result2 = ref_zcdot(m, x, inc_x, y, inc_y); 
 #else        

@@ -111,7 +111,7 @@ while (i < N) {
         }
 #endif       
         LOG( " %6d : Compare max \n", (int) N);
-        
+        LOG("maxf=%f\n",x[max]);
         ret_max=IAMAX (&N, x, &inc_x);
         LOG( "%d %c= %d\t",ret_max,(ret_max==max+1)?'=':'!',max+1);        
     int    not_passed =(ret_max==max+1)?0:1;
@@ -180,8 +180,9 @@ while (i < MIN(N,127)) {
         LOG("\n TEST with duplicate max values to check minimum index:\n NOTE: important for simd vector code case  \n");
         
         int minnx=MIN(N,127);
-        int duplicate_begin=MAX(0,minnx-13);
 
+        int duplicate_begin=MAX(0,minnx-13);
+printf("%d\n",duplicate_begin);
         for(i=duplicate_begin;i<minnx;i++){
 #ifdef COMPLEX
           x[i*inc_x2]=x[max*inc_x2];
@@ -193,9 +194,10 @@ while (i < MIN(N,127)) {
  
         }
 
-
            ret_max=IAMAX (&N, x, &inc_x);
-            not_passed |=(ret_max==duplicate_begin+1)?0:1;
+        printf("%d minnx %d duplicate_begin %d\n",N,minnx,duplicate_begin);
+        
+        not_passed |=(ret_max==duplicate_begin+1)?0:1;
            LOG( "%d %c= %d \t",ret_max,(ret_max==duplicate_begin+1)?'=':'!',duplicate_begin+1);  
 
         

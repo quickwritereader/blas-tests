@@ -142,6 +142,45 @@ while (i < N) {
             
         }
         LOG("\n");
+        LOG("\n TEST with duplicate min values to check minimum index:\n NOTE: important for simd vector code case  \n");
+
+        int minnx=MIN(N,127);
+
+        int duplicate_begin=MAX(0,minnx-13);
+printf("%d\n",duplicate_begin);
+        for(i=duplicate_begin;i<minnx;i++){
+#ifdef COMPLEX
+          x[i*inc_x2]=x[min*inc_x2];
+          x[i*inc_x2+1]=x[min*inc_x2+1];
+#else
+          x[i*inc_x]=x[min*inc_x];
+
+#endif
+
+        }
+
+           ret_min=IAMIN (&N, x, &inc_x);
+        printf("%d minnx %d duplicate_begin %d\n",N,minnx,duplicate_begin);
+
+        not_passed |=(ret_min==duplicate_begin+1)?0:1;
+           LOG( "%d %c= %d \t",ret_min,(ret_min==duplicate_begin+1)?'=':'!',duplicate_begin+1);
+
+
+          i=duplicate_begin=MAX(0,minnx-14);
+
+#ifdef COMPLEX
+          x[i*inc_x2]=x[min*inc_x2];
+          x[i*inc_x2+1]=x[min*inc_x2+1];
+#else
+          x[i*inc_x]=x[min*inc_x];
+
+#endif
+           ret_min=IAMIN (&N, x, &inc_x);
+            not_passed |=(ret_min==duplicate_begin+1)?0:1;
+           LOG( "%d %c= %d \t",ret_min,(ret_min==duplicate_begin+1)?'=':'!',duplicate_begin+1);
+
+
+         LOG("\n");
         if(not_passed) {
           ERROR_LOG("%s",STRINGIZE(IAMIN));
         }else{
