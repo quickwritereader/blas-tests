@@ -62,7 +62,7 @@ extern "C" {
 
 #ifndef COMPLEX
 #define COMPSIZE  1
- 
+
 #else
 #define COMPSIZE  2    
 #endif
@@ -79,22 +79,27 @@ extern "C" {
 #define EPL FLT_EPSILON     
 #endif
 #define CABS1(x,i)    ABS(x[i])+ABS(x[i+1])
+#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
+#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
+#define C(I,J) c[(I)-1 + ((J)-1)* ( *ldc)]
 
 #define STRINGIZE(x) #x
 #define LOG(format, ...)  fprintf (stderr, format  , ##__VA_ARGS__)
 #define ERROR_LOG(format, ...)  fprintf (stderr,"Error: " format "\n", ##__VA_ARGS__)
 #define PASS_LOG(format, ...)  fprintf (stderr,"Passed: " format "\n", ##__VA_ARGS__)    
+
     typedef struct __attribute__((__packed__)) {
         FLOAT real, imag;
-    } COMPLEX_FLOAT;
+    }
+    COMPLEX_FLOAT;
 
-    void compare_aggregate(BLASLONG aggregated_N,FLOAT *x,FLOAT *y, const char * str);
-    void compare_aggregate_real(BLASLONG aggregated_N, FLOAT  x, FLOAT  y, const char * str);
-    void compare_vals_ds(BLASLONG n, FLOAT *x, BLASLONG inc_x, FLOAT *y, BLASLONG inc_y, const char * str);
-    void compare_vals_zc(BLASLONG n, FLOAT *x, BLASLONG inc_x, FLOAT *y, BLASLONG inc_y, const char * str);
-        
+    void compare_aggregate(BLASLONG aggregated_N, FLOAT *x, FLOAT *y, const char * str);
+    void compare_aggregate_real(BLASLONG aggregated_N, FLOAT x, FLOAT y, const char * str);
+    void compare_vals_ds(BLASLONG aggregated_N, BLASLONG n, FLOAT *x, BLASLONG inc_x, FLOAT *y, BLASLONG inc_y, const char * str);
+    void compare_vals_zc(BLASLONG aggregated_N, BLASLONG n, FLOAT *x, BLASLONG inc_x, FLOAT *y, BLASLONG inc_y, const char * str);
+
     void compare_vals(BLASLONG n, FLOAT *x, BLASLONG inc_x, FLOAT *y, BLASLONG inc_y, const char * str);
-
+    void compare_vals_aggregated(BLASLONG aggregated_N, BLASLONG n, FLOAT *x, BLASLONG inc_x, FLOAT *y, BLASLONG inc_y, const char * str);
     /*Reference functions*/
     FLOAT ref_dot(BLASLONG n, FLOAT *x, BLASLONG inc_x, FLOAT *y, BLASLONG inc_y);
 
@@ -108,6 +113,10 @@ extern "C" {
 
     void ref_scal(BLASLONG n, FLOAT *alpha, FLOAT *x, BLASLONG inc_x);
 
+    unsigned char lsame_(char *ca, char *cb);
+    int ref_gemm(char *transa, char *transb, int *m, int *
+            n, int *k, FLOAT *alpha, FLOAT *a, int *lda, FLOAT *b, int *
+            ldb, FLOAT *beta, FLOAT *c, int *ldc);
 #ifdef __cplusplus
 }
 #endif
