@@ -1,6 +1,6 @@
 
-BLAS_INC_DIR = /home/ubuntu/new_openblas
-BLAS_LIB_DIR = /home/ubuntu/new_openblas
+BLAS_INC_DIR = /home/ubuntu/WORK/OpenBLAS
+BLAS_LIB_DIR = /home/ubuntu/WORK/OpenBLAS
 BLAS_LIBS := libopenblas.a
 INCLUDES = -I. -I$(BLAS_INC_DIR)
 CC	   := gcc
@@ -12,7 +12,7 @@ UTIL	   := bl_test.o
 MFLAGS :=
 PREF  :=
 
-Double_Tests := test_ddot test_drot test_daxpy test_dscal test_dasum test_dcopy test_dswap test_idamax  test_idamin test_dgemm
+Double_Tests := test_ddot test_drot test_daxpy test_dscal test_dasum test_dcopy test_dswap test_idamax  test_idamin test_dgemm test_trmm
 Float_Tests  :=  $(foreach tests,$(Double_Tests), $(subst _id,_is,$(subst _d,_s,$(tests)))) 
 Complex_Double_Tests :=   $(foreach tests,$(Double_Tests), $(subst _id,_iz,$(subst _d,_z,$(tests)))) 
 Complex_Float_Tests :=   $(foreach tests,$(Double_Tests), $(subst _id,_ic,$(subst _d,_c,$(tests)))) 
@@ -66,7 +66,9 @@ test_idamax : diamax.o d$(UTIL)
 test_idamin : diamin.o d$(UTIL)
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
 test_dgemm : dgemm.o c$(UTIL)
-	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)	
+	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
+test_dtrmm : dtrmm.o c$(UTIL)
+	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)		
 test_sdot : sdot.o s$(UTIL)
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
 test_sasum : sasum.o s$(UTIL)
@@ -87,6 +89,8 @@ test_isamin : siamin.o s$(UTIL)
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)  
 test_sgemm : sgemm.o c$(UTIL)
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
+test_strmm : strmm.o c$(UTIL)
+	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)	
 test_zdot : zdot.o z$(UTIL)
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
 test_zasum : zasum.o z$(UTIL)

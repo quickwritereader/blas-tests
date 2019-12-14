@@ -18,15 +18,9 @@ extern "C" {
 
 
 
-
-#ifndef MIN
-
-#define MIN(a,b)   (a>b? b:a)
-
-#endif
-
-
-#define MAX(a,b)   (a<b? b:a)
+ 
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
 
 
 
@@ -117,6 +111,13 @@ extern "C" {
     int ref_gemm(char *transa, char *transb, int *m, int *
             n, int *k, FLOAT *alpha, FLOAT *a, int *lda, FLOAT *b, int *
             ldb, FLOAT *beta, FLOAT *c, int *ldc);
+    int ref_trmm(char* side, char* uplo, char* transa, char* diag,
+    int* m, int* n, FLOAT* alpha, FLOAT* a, int* lda, FLOAT* b,
+    int* ldb);        
+
+    int ref_zgemm(char *transa, char *transb, int *m, int *n, int *k, COMPLEX_FLOAT *alpha, COMPLEX_FLOAT *a, int *lda, 
+	COMPLEX_FLOAT *b, int *ldb, COMPLEX_FLOAT *beta, COMPLEX_FLOAT *c,
+	 int *ldc);
 #ifdef __cplusplus
 }
 #endif
