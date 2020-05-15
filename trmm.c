@@ -49,11 +49,6 @@ int main(int argc, char* argv[]) {
 
 
 
-  fprintf(stderr,
-          "From : %3d  To : %3d Step = %3d Side = %c Uplo = %c Trans = %c Diag "
-          "= %c\n",
-          from, to, step, side, uplo, trans, diag);
-
       argc--;
     argv++;
 
@@ -99,6 +94,12 @@ int main(int argc, char* argv[]) {
     } else {
         n = to;
     }
+
+  fprintf(stderr,
+          "From : %3d  To : %3d Step = %3d Side = %c Uplo = %c Trans = %c Diag "
+          "= %c\n",
+          from, to, step, side, uplo, trans, diag);
+
 
     if ( side=='L') {
         k = m;
@@ -148,10 +149,6 @@ int main(int argc, char* argv[]) {
 
     }
     for (i = from; i <= to; i += step) {
-
-
-
-
         if (!has_param_m) {
             m = i;
         }
@@ -213,11 +210,13 @@ int main(int argc, char* argv[]) {
             }
             
         } else{
-          for (i = 0; i < (k + lc_add) * (n + lc_add) * COMPSIZE; i++) { 
-            b[i] = bi[i];
-            bref[i] = bi[i];
+          for (j = 0; j < (k + lc_add) * (n + lc_add) * COMPSIZE; j++) {
+            b[j] = bi[j];
+            bref[j] = bi[j];
           }
         } 
+
+        fprintf(stderr, " M=%4d, N=%4d, lda=%4d, ldb=%4d, alpha[0]=%f: \n", (int) m, (int) n, lda, ldb, alpha[0]);
 
     TRMM(&side, &uplo, &trans, &diag, &m, &n, alpha, a, &lda, b, &ldb);
 

@@ -12,7 +12,7 @@ UTIL	   := bl_test.o
 MFLAGS :=
 PREF  :=
 
-Double_Tests := test_ddot test_drot test_daxpy test_dscal test_dasum test_dcopy test_dswap test_idamax  test_idamin test_dgemm test_trmm
+Double_Tests := test_ddot test_drot test_daxpy test_dscal test_dasum test_dcopy test_dswap test_idamax  test_idamin test_dgemm test_dtrmm
 Float_Tests  :=  $(foreach tests,$(Double_Tests), $(subst _id,_is,$(subst _d,_s,$(tests)))) 
 Complex_Double_Tests :=   $(foreach tests,$(Double_Tests), $(subst _id,_iz,$(subst _d,_z,$(tests)))) 
 Complex_Float_Tests :=   $(foreach tests,$(Double_Tests), $(subst _id,_ic,$(subst _d,_c,$(tests)))) 
