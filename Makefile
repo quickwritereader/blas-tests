@@ -1,14 +1,13 @@
 
-BLAS_INC_DIR = /home/ubuntu/WORK/OpenBLAS
-BLAS_LIB_DIR = /home/ubuntu/WORK/OpenBLAS
-BLAS_LIBS := libopenblas.a
+BLAS_INC_DIR := $(if $(BLAS_INC_DIR),$(BLAS_INC_DIR),/opt/OpenBlas/include) 
+BLAS_LIB_DIR :=  $(if $(BLAS_LIB_DIR),$(BLAS_LIB_DIR),/opt/OpenBlas/lib) 
+BLAS_LIBS  := $(if $(BLAS_LIBS),  $(BLAS_LIBS),libopenblas.a )
 INCLUDES = -I. -I$(BLAS_INC_DIR)
 CC	   := gcc
 LINKER   := $(CC)
 CFLAGS   :=  -no-pie  -g -Wall -fopenmp
 LDFLAGS := -lm  -lpthread
-LIB_BLAS   := $(foreach libx,$(BLAS_LIBS), $(BLAS_LIB_DIR)/$(libx))
-UTIL	   := bl_test.o
+LIB_BLAS  :=  -L${BLAS_LIB_DIR}  $(foreach libx,$(BLAS_LIBS), -l:$(libx))
 MFLAGS :=
 PREF  :=
 
@@ -20,15 +19,10 @@ Complex_Float_Tests :=   $(foreach tests,$(Double_Tests), $(subst _id,_ic,$(subs
 .PHONY:  clean
 
 
-
-double :: $(Double_Tests)
-double $(Double_Tests):  MFLAGS = -DDOUBLE=1 
+double :: $(Double_Tests) 
 single :: $(Float_Tests)
-single $(Float_Tests) :  MFLAGS= 
-zdouble :: $(Complex_Double_Tests)
-zdouble $(Complex_Double_Tests):	 MFLAGS =  -DCOMPLEX=1 -DDOUBLE=1  
+zdouble :: $(Complex_Double_Tests) 
 csingle :: $(Complex_Float_Tests)
-csingle $(Complex_Float_Tests) :	 MFLAGS=  -DCOMPLEX=1
 all :: single
 all :: double
 all :: csingle
@@ -38,99 +32,101 @@ SOURCES=$(wildcard *.c)
 OBJECTS=$(SOURCES:%.c=%.o)
 
 d%.o: %.c
-	$(CC) $(CFLAGS) $(MFLAGS) $(INCLUDES) -c $< -o $@
+	$(CC) $(CFLAGS) -DDOUBLE=1 $(INCLUDES) -c $< -o $@
 s%.o: %.c
-	$(CC) $(CFLAGS) $(MFLAGS) $(INCLUDES) -c $< -o $@   
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@   
 c%.o: %.c
-	$(CC) $(CFLAGS) $(MFLAGS) $(INCLUDES) -c $< -o $@
+	$(CC) $(CFLAGS) -DCOMLEX=1 $(INCLUDES) -c $< -o $@
 z%.o: %.c
-	$(CC) $(CFLAGS) $(MFLAGS) $(INCLUDES) -c $< -o $@	 
+	$(CC) $(CFLAGS) -DDOUBLE=1 -DCOMPLEX=1 $(INCLUDES) -c $< -o $@	 
 	
-
-test_ddot : ddot.o d$(UTIL)
+test_ddot : ddot.o  dbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_dasum : dasum.o d$(UTIL)
+test_dasum : dasum.o dbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)	
-test_drot : drot.o d$(UTIL)
+test_drot : drot.o dbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)	
-test_daxpy : daxpy.o d$(UTIL)
+test_daxpy : daxpy.o dbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_dscal : dscal.o d$(UTIL)
+test_dscal : dscal.o dbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_dcopy : dcopy.o d$(UTIL)
+test_dcopy : dcopy.o dbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_dswap : dswap.o d$(UTIL)
+test_dswap : dswap.o dbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_idamax : diamax.o d$(UTIL)
+test_idamax : diamax.o dbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_idamin : diamin.o d$(UTIL)
+test_idamin : diamin.o dbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_dgemm : dgemm.o c$(UTIL)
+test_dgemm : dgemm.o dbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_dtrmm : dtrmm.o c$(UTIL)
+test_dtrmm : dtrmm.o dbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)		
-test_sdot : sdot.o s$(UTIL)
+test_sdot : sdot.o sbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_sasum : sasum.o s$(UTIL)
+test_sasum : sasum.o sbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)	
-test_srot : srot.o s$(UTIL)
+test_srot : srot.o sbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)	
-test_saxpy : saxpy.o s$(UTIL)
+test_saxpy : saxpy.o sbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_sscal : sscal.o s$(UTIL)
+test_sscal : sscal.o sbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_scopy : scopy.o s$(UTIL)
+test_scopy : scopy.o sbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_sswap : sswap.o s$(UTIL)
+test_sswap : sswap.o sbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_isamax : siamax.o s$(UTIL)
+test_isamax : siamax.o sbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_isamin : siamin.o s$(UTIL)
+test_isamin : siamin.o sbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)  
-test_sgemm : sgemm.o c$(UTIL)
+test_sgemm : sgemm.o sbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_strmm : strmm.o c$(UTIL)
+test_strmm : strmm.o sbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)	
-test_zdot : zdot.o z$(UTIL)
+test_zdot : zdot.o zbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_zasum : zasum.o z$(UTIL)
+test_zasum : zasum.o zbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)	
-test_zrot : zrot.o z$(UTIL)
+test_zrot : zrot.o zbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)	
-test_zaxpy : zaxpy.o z$(UTIL)
+test_zaxpy : zaxpy.o zbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_zscal : zscal.o z$(UTIL)
+test_zscal : zscal.o zbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_zcopy : zcopy.o z$(UTIL)
+test_zcopy : zcopy.o zbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_zswap : zswap.o z$(UTIL)
+test_zswap : zswap.o zbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_izamax : ziamax.o z$(UTIL)
+test_izamax : ziamax.o zbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_izamin : ziamin.o z$(UTIL)
+test_izamin : ziamin.o zbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_zgemm : zgemm.o c$(UTIL)
+test_zgemm : zgemm.o zbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_cdot : cdot.o c$(UTIL)
+test_ztrmm : ztrmm.o zbl_test.o
+	echo "ztrmm check  is missin"
+test_cdot : cdot.o cbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_casum : casum.o c$(UTIL)
+test_casum : casum.o cbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)	
-test_crot : crot.o c$(UTIL)
+test_crot : crot.o cbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)	
-test_caxpy : caxpy.o c$(UTIL)
+test_caxpy : caxpy.o cbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_cscal : cscal.o c$(UTIL)
+test_cscal : cscal.o cbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_ccopy : ccopy.o c$(UTIL)
+test_ccopy : ccopy.o cbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_cswap : cswap.o c$(UTIL)
+test_cswap : cswap.o cbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_icamax : ciamax.o c$(UTIL)
+test_icamax : ciamax.o cbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
-test_icamin : ciamin.o c$(UTIL)
+test_icamin : ciamin.o cbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS) 
-test_cgemm : cgemm.o c$(UTIL)
+test_cgemm : cgemm.o cbl_test.o
 	$(CC) $(CFLAGS) -o $(@F) $^ $(CEXTRALIB) $(EXTRALIB) $(FEXTRALIB) $(LIB_BLAS) $(LDFLAGS)
+test_ctrmm : ctrmm.o cbl_test.o
+	echo "ctrmm check is missing"
 clean ::
 	@rm -f  *.o test_*
-
